@@ -1,0 +1,15 @@
+Options -Indexes
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # sirve archivos y directorios existentes tal cual
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # manda todo lo demas a index.php (front controller)
+    # borrable si el proyecto usa varios .php sueltos en vez de un front controller
+    RewriteRule ^ index.php [L]
+</IfModule>
