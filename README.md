@@ -40,8 +40,8 @@ Un solo contenedor de aplicacion (`php:8.4-apache`, mod_php) mas MySQL y Adminer
 | `make shell` | Abre una terminal `bash` dentro del contenedor `app`. |
 | `make db-shell` | Abre el cliente `mysql` conectado a la base del proyecto. |
 | `make logs` | Sigue los logs de todos los servicios. |
-| `make db-import FILE=dump.sql` | Importa un dump SQL a la base del proyecto. |
-| `make fresh` | Borra el volumen de MySQL y vuelve a levantar todo de cero. Pide confirmacion explicita. |
+| `make db-import FILE=dump.sql` | Aplica un `.sql` a la base ya corriendo (dump completo o cambios incrementales), sin recrear el volumen ni perder datos. |
+| `make fresh` | Borra el volumen de MySQL y vuelve a levantar todo de cero (reaplica todo `docker/mysql/init/*.sql`). Pide confirmacion explicita. |
 
 ## Configuracion (`.env` en la raiz, no en `src/`)
 
@@ -56,6 +56,20 @@ DB_PASSWORD=secret
 ```
 
 `src/app/db.php` lee estas mismas variables con `getenv()` dentro del contenedor `app` (docker-compose las inyecta como `environment:`), no hace falta editar codigo para cambiarlas.
+
+## Agregar tablas nuevas sin perder datos
+
+`docker/mysql/init/*.sql` solo corre en el primer arranque del volumen `mysql-data` (ver tabla de arriba: `make fresh` es lo unico que los reaplica, y de paso borra todo). Para sumar una tabla o columna a un proyecto que ya tiene datos cargados, sin tocar lo que ya hay:
+
+1. Guardá el archivo en `docker/mysql/init/`, con el siguiente numero de orden: `02-nombre-descriptivo.sql`, `03-otra-cosa.sql`, etc. (segui la numeracion de `01-schema.sql`).
+2. Aplicalo a la base que ya esta corriendo, sin pasar por `make fresh`:
+   ```bash
+   make db-import FILE=docker/mysql/init/02-nombre-descriptivo.sql
+   ```
+
+`make db-import` no distingue entre "restaurar un dump" y "aplicar un cambio incremental": en los dos casos le pipea el archivo tal cual al cliente `mysql` contra la base ya corriendo. Lo que cambia es el contenido del `.sql` — `CREATE TABLE IF NOT EXISTS`/`ALTER TABLE` para no pisar lo que ya existe.
+
+Dejar el archivo en `docker/mysql/init/` (ademas de correr `db-import` a mano) sirve para el dia de mañana: si alguien clona el repo de cero o corres `make fresh`, ese `.sql` se aplica solo junto con el resto, sin pasos manuales.
 
 ## Arrancar un proyecto real
 
