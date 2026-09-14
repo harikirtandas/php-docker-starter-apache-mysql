@@ -10,7 +10,7 @@ Plantilla de GitHub para levantar un proyecto PHP plano (sin framework) dockeriz
 ## Crear un proyecto nuevo desde este template
 
 ```bash
-gh repo create mi-proyecto --template TU_USUARIO/php-docker-starter-apache-mysql --private --clone
+gh repo create mi-proyecto --template harikirtandas/php-docker-starter-apache-mysql --private --clone
 cd mi-proyecto
 make install
 ```
@@ -73,6 +73,6 @@ Dejar el archivo en `docker/mysql/init/` (ademas de correr `db-import` a mano) s
 
 ## Arrancar un proyecto real
 
-1. `gh repo create mi-proyecto --template TU_USUARIO/php-docker-starter-apache-mysql --private --clone && cd mi-proyecto`
+1. `gh repo create mi-proyecto --template harikirtandas/php-docker-starter-apache-mysql --private --clone && cd mi-proyecto`
 2. Reemplazar `docker/mysql/init/01-schema.sql` por el schema real del proyecto (o agregar mas archivos `.sql` numerados) y borrar/editar `src/public/index.php` (es una demo descartable).
 3. `make install` — levanta todo y, si hay `src/composer.json`, instala las dependencias.
